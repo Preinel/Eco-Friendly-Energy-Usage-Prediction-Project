@@ -66,4 +66,34 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 print("Training Samples:", X_train.shape)
 print("Testing Samples:", X_test.shape)
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score, mean_absolute_error
+
+# Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predict
+y_pred = model.predict(X_test)
+
+# Check accuracy
+print("R2 Score:", r2_score(y_test, y_pred))
+print("MAE:", mean_absolute_error(y_test, y_pred))
+from sklearn.ensemble import RandomForestRegressor
+
+rf = RandomForestRegressor(n_estimators=100)
+rf.fit(X_train, y_train)
+
+rf_pred = rf.predict(X_test)
+
+print("Optimized R2:", r2_score(y_test, rf_pred))
+print("Optimized MAE:", mean_absolute_error(y_test, rf_pred))
+import matplotlib.pyplot as plt
+
+plt.scatter(y_test, rf_pred)
+plt.xlabel("Actual Energy")
+plt.ylabel("Predicted Energy")
+plt.title("Actual vs Predicted")
+plt.show()
+
 
