@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 df = pd.read_csv("https://raw.githubusercontent.com/Preinel/Eco-Friendly-Energy-Usage-Prediction-Project/refs/heads/main/smart_home_energy_consumption_large.csv")
+df.dropna(inplace=True)
 print("Dataset Loaded Successfully\n")
 print(df.head())
 
@@ -20,10 +21,38 @@ df.drop(columns=["Date", "Time", "DateTime"], inplace=True)
 print("\nAfter Feature Engineering:")
 print(df.head())
 
-#distribution graph
+#APPLIANCE ENERGY CONSUMPTION
+print("\nAppliance Energy Consumption Analysis:")
+overall_avg = df["Energy Consumption (kWh)"].mean()
+appliance_avg = df.groupby("Appliance Type")["Energy Consumption (kWh)"].mean()
+print("\nOverall Average Energy Consumption:", round(overall_avg, 2), "kWh")
+print("\nAverage Energy Consumption by Appliance:")
+print(appliance_avg)
+
+# which appl consume more than avg
+above_avg = appliance_avg[appliance_avg > overall_avg]
+print("\nAppliances Consuming More Than Overall Average:")
+print(above_avg)
+#GRAPH
 plt.figure()
-sns.histplot(df["Energy Consumption (kWh)"], kde=True)
-plt.title("Energy Consumption Distribution")
+appliance_avg_sorted = appliance_avg.sort_values(ascending=False)
+plt.bar(appliance_avg_sorted.index, appliance_avg_sorted.values)
+plt.axhline(y=overall_avg, linestyle="--")
+plt.xticks(rotation=45)
+plt.title("Average Energy Consumption by Appliance")
+plt.ylabel("Average Energy Consumption (kWh)")
+plt.xlabel("Appliance Type")
+plt.show()
+
+# plot graph for household size
+print("\nHousehold Size Impact on Energy Consumption:")
+household_avg = df.groupby("Household Size")["Energy Consumption (kWh)"].mean()
+print(household_avg)
+plt.figure()
+plt.plot(household_avg.index, household_avg.values, marker='o')
+plt.title("Household Size vs Average Energy Consumption")
+plt.xlabel("Household Size")
+plt.ylabel("Average Energy Consumption (kWh)")
 plt.show()
 
 #season boxplot
@@ -62,6 +91,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 print("Training Samples:", X_train.shape)
 print("Testing Samples:", X_test.shape)
 
+
+
+
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
@@ -94,36 +126,36 @@ results = pd.DataFrame({
         r2_score(y_test, y_pred),
         r2_score(y_test, dt_pred),
         r2_score(y_test, rf_pred),
-        r2_score(y_test, gb_pred)
-    ],
+        r2_score(y_test, gb_pred)],
     "MAE": [
         mean_absolute_error(y_test, y_pred),
         mean_absolute_error(y_test, dt_pred),
         mean_absolute_error(y_test, rf_pred),
-        mean_absolute_error(y_test, gb_pred)
-    ]
+        mean_absolute_error(y_test, gb_pred)]
 })
 
 print("\nModel Comparison:")
 print(results)
 
 #actual vs predicted
-plt.figure()
 
-plt.scatter(y_test, y_pred, alpha=0.5, label="Linear Regression")
-plt.scatter(y_test, dt_pred, alpha=0.5, label="Decision Tree")
-plt.scatter(y_test, rf_pred, alpha=0.5, label="Random Forest")
-plt.scatter(y_test, gb_pred, alpha=0.5, label="Gradient Boosting")
+models_predictions = {
+    "Linear Regression": y_pred,
+    "Decision Tree": dt_pred,
+    "Random Forest": rf_pred,
+    "Gradient Boosting": gb_pred
+}
 
-plt.plot([y_test.min(), y_test.max()],
-         [y_test.min(), y_test.max()],
-         linestyle="--")
-
-plt.xlabel("Actual Energy Consumption")
-plt.ylabel("Predicted Energy Consumption")
-plt.title("Actual vs Predicted - Model Comparison")
-plt.legend()
-plt.show()
+for name, predictions in models_predictions.items():
+    plt.figure()
+    plt.scatter(y_test, predictions, alpha=0.5)
+    plt.plot([y_test.min(), y_test.max()],
+             [y_test.min(), y_test.max()],
+             linestyle="--")
+    plt.xlabel("Actual Energy Consumption")
+    plt.ylabel("Predicted Energy Consumption")
+    plt.title(f"Actual vs Predicted - {name}")
+    plt.show()
 
 #r2 Comparison
 plt.figure()
