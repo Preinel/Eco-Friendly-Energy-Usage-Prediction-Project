@@ -6,7 +6,7 @@ to recommend eco-friendly practices.
 #PREREQUISITES
 1) Make sure you have:
   Python 3.8 or higher
-  Git
+  and Git
 3) Open Cmd and run: pip install pandas numpy seaborn matplotlib scikit-learn
   
 
