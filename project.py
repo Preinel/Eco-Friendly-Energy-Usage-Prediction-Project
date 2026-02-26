@@ -14,7 +14,6 @@ df["Hour"] = df["DateTime"].dt.hour
 df["Day"] = df["DateTime"].dt.day
 df["Month"] = df["DateTime"].dt.month
 df["Weekday"] = df["DateTime"].dt.weekday
-df["Is_Weekend"] = df["Weekday"].apply(lambda x: 1 if x >= 5 else 0)
 
 df.drop(columns=["Date", "Time", "DateTime"], inplace=True)
 
@@ -172,3 +171,4 @@ plt.xticks(rotation=45)
 plt.title("MAE Comparison")
 plt.ylabel("MAE")
 plt.show()
+
